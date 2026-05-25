@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Convera AI — System Flow</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #0a0a1a;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    .slide {
+      width: 1280px;
+      min-height: 720px;
+      background: linear-gradient(135deg, #0d0d2b 0%, #1a1a3e 50%, #0d0d2b 100%);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 20px;
+      padding: 40px 50px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Background glow blobs */
+    .slide::before {
+      content: '';
+      position: absolute;
+      top: -100px; left: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(233,69,96,0.12) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .slide::after {
+      content: '';
+      position: absolute;
+      bottom: -100px; right: -100px;
+      width: 400px; height: 400px;
+      background: radial-gradient(circle, rgba(15,52,96,0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* Header */
+    .header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .header .badge {
+      display: inline-block;
+      background: rgba(233,69,96,0.15);
+      border: 1px solid rgba(233,69,96,0.4);
+      color: #e94560;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+      margin-bottom: 10px;
+    }
+    .header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.5px;
+    }
+    .header h1 span {
+      background: linear-gradient(90deg, #e94560, #7b61ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Main flow layout */
+    .flow {
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Each column */
+    .col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    /* Arrow between columns */
+    .arrow-h {
+      display: flex;
+      align-items: center;
+      padding-top: 22px;
+      color: rgba(255,255,255,0.25);
+      font-size: 22px;
+      margin: 0 4px;
+    }
+
+    /* Block styles */
+    .block {
+      border-radius: 12px;
+      padding: 12px 16px;
+      text-align: center;
+      border: 1px solid;
+      position: relative;
+      width: 148px;
+    }
+
+    .block .icon {
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+    .block .label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 2px;
+    }
+    .block .sub {
+      font-size: 10px;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.4;
+    }
+    .block .tag {
+      display: inline-block;
+      font-size: 9px;
+      font-weight: 600;
+      padding: 2px 7px;
+      border-radius: 20px;
+      margin-top: 6px;
+      letter-spacing: 0.5px;
+    }
+
+    /* Color themes */
+    .red {
+      background: rgba(233,69,96,0.12);
+      border-color: rgba(233,69,96,0.4);
+    }
+    .red .tag { background: rgba(233,69,96,0.2); color: #e94560; }
+
+    .blue {
+      background: rgba(15,52,96,0.4);
+      border-color: rgba(99,160,255,0.3);
+    }
+    .blue .tag { background: rgba(99,160,255,0.15); color: #63a0ff; }
+
+    .purple {
+      background: rgba(123,97,255,0.12);
+      border-color: rgba(123,97,255,0.35);
+    }
+    .purple .tag { background: rgba(123,97,255,0.2); color: #b39dff; }
+
+    .green {
+      background: rgba(34,197,94,0.1);
+      border-color: rgba(34,197,94,0.3);
+    }
+    .green .tag { background: rgba(34,197,94,0.15); color: #4ade80; }
+
+    .orange {
+      background: rgba(251,146,60,0.1);
+      border-color: rgba(251,146,60,0.3);
+    }
+    .orange .tag { background: rgba(251,146,60,0.15); color: #fb923c; }
+
+    .teal {
+      background: rgba(20,184,166,0.1);
+      border-color: rgba(20,184,166,0.3);
+    }
+    .teal .tag { background: rgba(20,184,166,0.15); color: #2dd4bf; }
+
+    /* Vertical arrow inside col */
+    .arrow-v {
+      color: rgba(255,255,255,0.2);
+      font-size: 16px;
+      line-height: 1;
+    }
+
+    /* Section label above col */
+    .col-label {
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.25);
+      margin-bottom: 4px;
+    }
+
+    /* Bottom export row */
+    .exports {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 28px;
+      position: relative;
+      z-index: 1;
+    }
+    .export-block {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 10px;
+      padding: 10px 20px;
+      text-align: center;
+      width: 120px;
+    }
+    .export-block .icon { font-size: 18px; margin-bottom: 4px; }
+    .export-block .label { font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.7); }
+    .export-block .sub { font-size: 9px; color: rgba(255,255,255,0.3); margin-top: 2px; }
+
+    .exports-title {
+      text-align: center;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.2);
+      margin-top: 20px;
+      margin-bottom: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Divider line */
+    .divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+      margin: 20px 0 0;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      margin-top: 18px;
+      position: relative;
+      z-index: 1;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 10px;
+      color: rgba(255,255,255,0.35);
+    }
+    .legend-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+  <div class="slide">
+
+    <!-- Header -->
+    <div class="header">
+      <div class="badge">System Architecture</div>
+      <h1>Convera AI — <span>Voice Interview Pipeline</span></h1>
+    </div>
+
+    <!-- Main Flow -->
+    <div class="flow">
+
+      <!-- Col 1: Input -->
+      <div class="col">
+        <div class="col-label">Input</div>
+        <div class="block red">
+          <div class="icon">🎙️</div>
+          <div class="label">Voice Input</div>
+          <div class="sub">Browser mic recording</div>
+          <span class="tag">MediaRecorder API</span>
+        </div>
+        <div class="arrow-v">↓</div>
+        <div class="block red">
+          <div class="icon">📝</div>
+          <div class="label">Text Input</div>
+          <div class="sub">Fallback typing mode</div>
+          <span class="tag">Textarea</span>
+        </div>
+      </div>
+
+      <div class="arrow-h">→</div>
+
+      <!-- Col 2: Speech Processing -->
+      <div class="col">
+        <div class="col-label">Speech Processing</div>
+        <div class="block blue">
+          <div class="icon">🔊</div>
+          <div class="label">Whisper STT</div>
+          <div class="sub">Audio → Text transcription</div>
+          <span class="tag">faster-whisper</span>
+        </div>
+        <div class="arrow-v">↓</div>
+        <div class="block blue">
+          <div class="icon">🧬</div>
+          <div class="label">NLP Analysis</div>
+          <div class="sub">Skills, entities, topics</div>
+          <span class="tag">spaCy</span>
+        </div>
+      </div>
+
+      <div class="arrow-h">→</div>
+
+      <!-- Col 3: AI Brain -->
+      <div class="col">
+        <div class="col-label">AI Brain</div>
+        <div class="block purple">
+          <div class="icon">🤖</div>
+          <div class="label">Interview Agent</div>
+          <div class="sub">Generates follow-up questions</div>
+          <span class="tag">Ollama / Claude</span>
+        </div>
+        <div class="arrow-v">↓</div>
+        <div class="block purple">
+          <div class="icon">🔈</div>
+          <div class="label">AI Voice</div>
+          <div class="sub">Speaks questions aloud</div>
+          <span class="tag">edge-tts Jenny</span>
+        </div>
+      </div>
+
+      <div class="arrow-h">→</div>
+
+      <!-- Col 4: Knowledge Store -->
+      <div class="col">
+        <div class="col-label">Knowledge Store</div>
+        <div class="block green">
+          <div class="icon">🔢</div>
+          <div class="label">Embeddings</div>
+          <div class="sub">Text → vectors</div>
+          <span class="tag">sentence-transformers</span>
+        </div>
+        <div class="arrow-v">↓</div>
+        <div class="block green">
+          <div class="icon">🗄️</div>
+          <div class="label">Qdrant DB</div>
+          <div class="sub">Vector storage & search</div>
+          <span class="tag">qdrant-client</span>
+        </div>
+      </div>
+
+      <div class="arrow-h">→</div>
+
+      <!-- Col 5: Output -->
+      <div class="col">
+        <div class="col-label">Output</div>
+        <div class="block teal">
+          <div class="icon">📋</div>
+          <div class="label">Summary</div>
+          <div class="sub">AI-generated profile</div>
+          <span class="tag">Ollama / Claude</span>
+        </div>
+        <div class="arrow-v">↓</div>
+        <div class="block teal">
+          <div class="icon">💬</div>
+          <div class="label">AI Chatbot</div>
+          <div class="sub">RAG-powered assistant</div>
+          <span class="tag">Personalized</span>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Divider -->
+    <div class="divider"></div>
+
+    <!-- Export row -->
+    <div class="exports-title">Export Formats</div>
+    <div class="exports">
+      <div class="export-block">
+        <div class="icon">📄</div>
+        <div class="label">PDF Report</div>
+        <div class="sub">ReportLab</div>
+      </div>
+      <div class="export-block">
+        <div class="icon">📊</div>
+        <div class="label">CSV Data</div>
+        <div class="sub">Pandas</div>
+      </div>
+      <div class="export-block">
+        <div class="icon">🗂️</div>
+        <div class="label">JSON Export</div>
+        <div class="sub">Structured data</div>
+      </div>
+      <div class="export-block">
+        <div class="icon">🤖</div>
+        <div class="label">AI Training</div>
+        <div class="sub">Fine-tune ready</div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#e94560"></div> User Input</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#63a0ff"></div> Speech Processing</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#b39dff"></div> AI / LLM</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#4ade80"></div> Knowledge Storage</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#2dd4bf"></div> Output</div>
+    </div>
+
+  </div>
+</body>
+</html>
