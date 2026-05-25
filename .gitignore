@@ -1,0 +1,30 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*.pyo
+.env
+*.egg-info/
+dist/
+build/
+
+# Exports & uploads
+backend/exports/
+backend/uploaded_images/
+
+# Models cache (large files)
+backend/.cache/
+*.bin
+*.pt
+
+# Next.js
+frontend/.next/
+frontend/node_modules/
+frontend/.env.local
+
+# macOS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/
